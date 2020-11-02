@@ -10,12 +10,28 @@ var createTask = function(taskText, taskDate, taskList) {
     .addClass("m-1")
     .text(taskText);
 
+  
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  // check due date
+  auditTask(taskLi); 
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
+};
+
+var auditTask = function(taskEl) {
+  // get date from task element
+  var date = $(taskEl).find("span").text().trim();
+  // ensure it worked
+  console.log(date); 
+
+  // convert to moment object at 5:00pm
+  var time = moment(date, "L").set("hour", 17);
+  // this should print out an object for the value of the date variable, but at 5:00pm of that date
+  console.log(time);
+
 };
 
 var loadTasks = function() {
@@ -131,13 +147,22 @@ $(".list-group").on("click", "span", function() {
 
   // swap out elements
   $(this).replaceWith(dateInput);
+  // enable jquery ui datepicker
+  dateInput.datepicker({
+    minDate: 1,
+    onClose: function() {
+      // when calendar is closed, force a "change" event on the `dateInput`
+      $(this).trigger("change");
+    }
+  });
 
-  // automatically focus on new element
+  // automatically bring up the calendar
   dateInput.trigger("focus");
+
 });
 
 // value of due date was changed
-$(".list-group").on("blur", "input[type='text']", function() {
+$(".list-group").on("change", "input[type='text']", function() {
   // get current text
   var date = $(this)
     .val()
@@ -241,6 +266,12 @@ $("#trash").droppable({
     console.log("out");
   }
 });
+
+//date picker
+$("#modalDueDate").datepicker({
+  minDate: 1
+}
+);
 
 
 // load tasks for the first time
